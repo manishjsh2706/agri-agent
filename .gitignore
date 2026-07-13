@@ -1,0 +1,53 @@
+# ===== SECRETS — NEVER COMMIT =====
+.env
+.env.*
+*.pem
+*.key
+
+# ===== DATABASE — Production data, must not leak =====
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# ===== VIRTUAL ENVIRONMENTS =====
+.venv/
+venv/
+env/
+ENV/
+
+# ===== PYTHON CACHE =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# ===== DAILY GENERATED FILES =====
+daily_advice_*.json
+daily_messages_*.json
+cron_test.log
+daily_run.log
+*.log
+
+# ===== IDE / EDITOR =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== OS FILES =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== DEPLOYMENT ARTIFACTS =====
+*.tar.gz
+agri-agent-backup-*/
+agri-agent-broken/
+
+# ===== PACKAGE MANAGERS =====
+*.egg-info/
+dist/
+build/
