@@ -31,7 +31,7 @@ SAMPLE_FARMERS = [
     },
     {
         "phone":     "9876500002",
-        "name":      "Rohan Pawar",
+        "name":      "Naveen Joshi",
         "village":   "Baramati",
         "latitude":  18.1514,
         "longitude": 74.5800,
@@ -40,7 +40,7 @@ SAMPLE_FARMERS = [
         "language":  "mr",
     },
     {
-        "phone":     "9876500003",
+        "phone":     "9074674426",
         "name":      "Sita Kale",
         "village":   "Chinchwad",
         "latitude":  18.6420,
@@ -58,10 +58,12 @@ SAMPLE_STOCK = {
         ("Wheat", 12, "10/06/2026", "Stored at home"),
     ],
     "9876500002": [
-        ("Onion", 35, "20/06/2026", "First harvest of season"),
+        ("Onion", 35, "20/07/2026", "First harvest of season"),
     ],
-    "9876500003": [
-        ("Wheat", 18, "08/06/2026", ""),
+    "9074674426": [
+        ("Wheat", 18, "16/07/2026", ""),
+        ("Onion", 25, "18/07/2026", "Local variety"),
+        ("Tomato", 50, "20/06/2026", "Stored at home"),
     ],
 }
 
