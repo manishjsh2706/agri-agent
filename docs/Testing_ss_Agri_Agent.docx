@@ -1,0 +1,71 @@
+Agri-Agent — Live Testing Screenshots
+AI Market Advisor for Small-Scale Indian Farmers
+Author: Manish Joshi   |   Deployment: Oracle Cloud (Free Tier)   |   Channel: Telegram bot @agri_agent_pilot_bot
+About This Document
+This document captures a live end-to-end testing session of the Agri-Agent Telegram bot conducted against the production deployment running on Oracle Cloud. Each screenshot below shows one real interaction between a registered farmer and the bot, along with a short description of what the agent did behind the scenes and which capability was demonstrated.
+The system combines a LangGraph agent (with per-user conversation memory), 10+ custom LangChain tools (mandi price lookup, price forecasting, weather, mandi resolver, stock and sell-intent management), OpenAI GPT-4o-mini for natural-language reasoning, and multi-language output (Hindi, Marathi, English). The bot answers on demand and also sends proactive briefings every morning at 6 AM IST via a cron-scheduled pipeline.
+Every price, mandi name, and weather figure shown in these screenshots was computed from live data at the moment of the query — no answer is fabricated by the language model. The procedural system prompt forces the agent to call a tool for every numeric or factual claim before responding.
+Screenshot 1 — Bot Welcome & Registration Prompt
+The farmer opens Telegram, searches for the Agri-Agent Pilot bot, and sends the /start command. The bot introduces itself, explains its two capabilities (proactive daily briefings AND on-demand Q&A in chat), and instructs the farmer to register with /register <phone>. This is the entry point for every new user.
+Capability shown: onboarding flow.
+
+ 
+Screenshot 2 — Successful Farmer Registration
+The farmer sends /register 9074674426. The bot looks up the phone number in the farmers database, links the Telegram chat_id to that farmer profile, and sends a personalized confirmation: "Registered! Manish Joshi ji, you will now receive daily advice for Chinchwad." The village is picked up automatically from the farmer profile.
+Capability shown: chat-to-database mapping and personalized greeting.
+ 
+Screenshot 3 — Sell Intent Recording (Natural Language)
+The farmer sends a free-form message in English: "I want to sell my Tomatos on 24rd July 2026." The agent parses the intent, extracts the crop (Tomato), the quantity (50 quintals, from the farmer stock), and the target date (24 July 2026), and confirms the entry has been saved. No form-filling required.
+Capability shown: natural-language intent extraction and persistence via the record_sell_intent LangChain tool.
+ 
+Screenshot 4 — Nearest Mandi Price for a Specific Crop
+The farmer asks: "Could you please tell me what were today’s mandi rates for tomato in my nearest mandi?" The agent identifies the nearest mandi (Pune Manjri APMC, 23.7 km) using geospatial lookup, returns the modal price (Rs 3500/q), the net price after transport cost (Rs 3486.71/q), and includes a data-freshness caveat when applicable.
+Capability shown: geospatial mandi resolution + net-price calculation + staleness disclosure.
+ 
+Screenshot 5 — All Mandis — Price Comparison for One Crop
+The farmer asks a broader question: "Today’s mandi rates for tomato in mandi?" The agent returns tomato prices across every Pune-district mandi with recent data — Pune (Manjri), Pune (Pimpri), Khed, Khed (Chakan) — with min, modal, max, and arrival date for each. Helps the farmer compare markets before deciding where to travel.
+Capability shown: bulk cross-mandi price lookup for a single crop.
+ 
+Screenshot 6 — Nearest Mandi Lookup
+The farmer asks: "Which mandi is closest to me?" The agent runs a haversine distance calculation against the farmer’s registered latitude/longitude and returns "Pune (Pimpri) APMC, just 2.0 km away." A purely locational answer with no mixed-in price data.
+Capability shown: haversine distance calculation over registered farmer coordinates.
+ 
+Screenshot 7 — All Crops at a Specific Mandi
+The farmer asks: "Which crops were traded today in my nearest mandi?" The agent lists every crop that recorded a trade at Pune (Pimpri) APMC on that day — Beetroot Rs 2000/q, Bhindi Rs 6000/q, Bottle Gourd Rs 2600/q, Brinjal Rs 1500/q, Cabbage Rs 1800/q, and more. Useful when the farmer is unsure which of their crops has active demand today.
+Capability shown: single-mandi crop listing with freshness and sanity filters.
+ 
+Screenshot 8 — Best-Day-to-Sell Recommendation with Weather Check
+The farmer asks: "I want to go to the mandi to sell my onions tomorrow. Please suggest which mandi I should go to so that I can get a higher price." The agent runs a Holt-Winters price forecast on onion, checks Open-Meteo weather for the farmer’s coordinates, and gives an actionable answer: "Tomorrow is the best day. Expected Rs 1586.12/q (Rs 486 more than today’s Rs 1100). Weather is moderate drizzle at 27.6 C — safe to travel. Consider Pune (Manjri) APMC or Pune (Pimpri) APMC."
+Capability shown: forecast + weather + mandi recommendation combined into one advisor response.
+ 
+Screenshot 9 — Follow-up Question with Explainable Reasoning
+The farmer asks a follow-up on the previous answer: "On what basis did you provide suggestions for Pune (Manjri) APMC and Pune (Pimpri) APMC mandi for my onion crop?" The agent explains its recommendation across three factors: (1) proximity — Pimpri is 2 km away, (2) historical price competitiveness, (3) expected upward trend for tomorrow. Demonstrates conversation memory across turns and transparent reasoning.
+Capability shown: LangGraph per-user conversation memory + explainable AI response.
+ 
+Screenshot 10 — Farmer Stock Lookup
+The farmer asks: "Can you tell me what crop stock I currently have?" The agent queries the farmer’s stock table and returns Tomato 50q, Onion 25q, Wheat 18q. Fully personalized to the logged-in farmer profile.
+Capability shown: personalized data retrieval from the farmer profile.
+ 
+Screenshot 11 — Open Sell Intents Recap
+The farmer asks: "Can you tell me which crops I am planning to sell in the future?" The agent returns both open intents recorded earlier — Onion 25q by 23 July 2026, Tomato 50q by 24 July 2026 — with their deadlines. Persistent memory across sessions.
+Capability shown: sell-intent persistence and retrieval via list_my_intents tool.
+ 
+Screenshot 12 — 7-Day Weather Forecast
+The farmer asks: "Can you tell me what the weather will be like next week?" The agent calls the Open-Meteo API with the farmer’s latitude/longitude and returns a day-by-day forecast — max/min temperature, condition, and a safe-to-travel flag — for the next seven days. This feeds directly into the sell-timing decisions.
+Capability shown: geospatial weather integration with a mandi-travel safety flag.
+ 
+Screenshot 13 — Sell-Now-vs-Wait Decision (with Data-Quality Caveat)
+The farmer asks: "I am thinking of selling my 20 quintals of garlic tomorrow. Should I sell or hold?" Garlic has only 16 days of price history in the database — below the reliability threshold. The agent honestly discloses this limitation ("only 16 days of price history — may not provide a reliable forecast") but still gives a recommendation using current price and weather. A deliberate anti-hallucination safeguard: the agent surfaces uncertainty rather than inventing a confident answer.
+Capability shown: confidence-band reasoning + honest data-quality disclosure (anti-hallucination guardrail).
+ 
+Screenshot 14 — Sell-Now-vs-Wait Decision (Confident Recommendation)
+The farmer asks about onions — a crop with plenty of price history. The agent gives a decisive answer: "Tomorrow is the best day to sell. Expected Rs 1586.12/q, an Rs 486 increase over today’s Rs 1100. Weather is safe. Recommendation: sell tomorrow." Contrast this with the previous screenshot — same tool, different confidence level based on data quality.
+Capability shown: forecast + weather + advisor combined into a single decisive recommendation when data is sufficient.
+ 
+Screenshot 15 — Multi-Crop Forecast Comparison
+The farmer asks: "Can you tell me which crops are likely to get higher prices next week?" The agent runs a forecast across every crop in the farmer’s stock and ranks them by expected percentage gain: Onion +44.19%, Tomato +37.88%, Wheat +1.02%, and Garlic with an insufficient-data note. Helps the farmer prioritize which crop to sell first.
+Capability shown: multi-crop forecasting + ranked comparison + per-crop data-quality flag.
+ 
+Summary
+The 15 screenshots above demonstrate the full capability surface of the Agri-Agent bot: onboarding and registration, natural-language intent capture, single-mandi and multi-mandi price lookups, geospatial nearest-mandi resolution, personalized stock and intent recall, 7-day weather forecasting, price forecasting with confidence bands, sell-now-vs-wait decisions, multi-crop comparison, and explainable follow-up reasoning across turns.
+The same tool + agent + prompt architecture demonstrated here is directly transferable to enterprise use cases such as agentic customer support, sales enablement, internal knowledge search, and workflow automation over existing systems of record.

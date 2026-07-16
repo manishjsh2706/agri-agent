@@ -21,13 +21,13 @@ from farmer_profile import save_farmer, set_stock, list_stock
 SAMPLE_FARMERS = [
     {
         "phone":     "9876500001",
-        "name":      "Manish Joshi",
+        "name":      "Praveen Joshi",
         "village":   "Hadapsar",
         "latitude":  18.5089,
         "longitude": 73.9259,
         "vehicle":   "mini_truck",
         "crops":     "Onion,Wheat,Tomato",
-        "language":  "en",
+        "language":  "Hi",
     },
     {
         "phone":     "9876500002",
@@ -41,13 +41,13 @@ SAMPLE_FARMERS = [
     },
     {
         "phone":     "9074674426",
-        "name":      "Sita Kale",
+        "name":      "Manish Joshi",
         "village":   "Chinchwad",
         "latitude":  18.6420,
         "longitude": 73.7860,
         "vehicle":   "truck",
         "crops":     "Wheat,Arhar (Tur/Red Gram)(Whole)",
-        "language":  "hi",
+        "language":  "en",
     },
 ]
 

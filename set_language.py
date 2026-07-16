@@ -8,6 +8,7 @@ Language codes accepted:
 Usage:
     python set_language.py 9876500001 hi
     python set_language.py 9876500002 mr
+    python set_language.py 9074674426 en
 
 Run with no arguments to see the current language for every farmer.
 """

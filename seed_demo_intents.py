@@ -14,7 +14,7 @@ from db import init_db
 from open_intents import create_intent
 
 
-TARGET_PHONE = "9876500001"   # the farmer you've been testing with
+TARGET_PHONE = "9074674426"   # the farmer you've been testing with
 
 
 def main() -> None:
