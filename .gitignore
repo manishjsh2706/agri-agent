@@ -51,3 +51,7 @@ agri-agent-broken/
 *.egg-info/
 dist/
 build/
+
+
+# RAG vector store (regenerate with build_scheme_index.py)
+scheme_index/

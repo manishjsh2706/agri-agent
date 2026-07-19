@@ -1,14 +1,30 @@
+# Core web + async
 requests>=2.31.0
 fastapi>=0.111.0
 uvicorn>=0.29.0
-python-multipart>=0.0.9
+
+# LangChain stack
 langchain-core>=0.2.10
 langchain-openai>=0.1.15
 langgraph>=0.2.14
 langgraph-checkpoint>=1.0.0
+
+# RAG additions (Stage RAG.3)
+langchain-text-splitters>=0.2.2
+langchain-chroma>=0.1.4
+chromadb>=0.4.24
+# pysqlite3-binary: Oracle Linux 9 ships old sqlite3 (3.34.x);
+# Chroma needs >= 3.35. Monkey-patched at import time.
+pysqlite3-binary>=0.5.0
+
+# OpenAI SDK (direct)
 openai>=1.30.0
+
+# Numeric + ML stack (for forecast engine)
 numpy>=1.26.0
 scikit-learn>=1.4.0
 statsmodels>=0.14.0
+
+# I/O helpers
 openpyxl>=3.1.0
 python-dotenv>=1.0.0

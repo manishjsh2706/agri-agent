@@ -26,6 +26,7 @@ from best_window import best_window
 from farmer_profile import get_farmer, list_stock
 from open_intents import create_intent, list_open_intents
 from weather import get_daily_forecast
+from scheme_tool import lookup_scheme_info_tool
 
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -630,4 +631,5 @@ ALL_TOOLS = [
     find_mandi_by_name_tool,
     list_all_crops_near_me_tool,
     list_crops_at_mandi_tool,
+    lookup_scheme_info_tool,
 ]

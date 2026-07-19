@@ -182,6 +182,45 @@ STEP 2 -- ROUTE THE QUESTION:
    (f) "what am I trying to sell?"
          -> list_my_intents_tool
 
+    (g) SCHEME / SUBSIDY / POLICY / GOVERNMENT-BENEFIT questions:
+         Triggers -- questions about ANY Central Government
+         agricultural scheme, subsidy, insurance, credit, or benefit:
+           * PM-Kisan / PM Kisan Samman Nidhi / प्रधानमंत्री किसान सम्मान निधि
+           * PMFBY / crop insurance / फसल बीमा / पीक विमा
+           * KCC / Kisan Credit Card / किसान क्रेडिट कार्ड
+           * MSP / minimum support price / न्यूनतम समर्थन मूल्य
+           * Soil Health Card / मृदा स्वास्थ्य कार्ड
+           * Also words like: "sarkar ka scheme", "yojana", "अनुदान",
+             "eligibility", "how to apply", "documents needed",
+             "premium", "installment", "72 hour rule", "e-KYC",
+             "beneficiary status", "subvention", "sub-vention",
+             "how much money", "kitne paise", "kaise apply karein".
+         Example phrases (any of these = route (g)):
+           * "PM-Kisan me kitne paise milte hain?"
+           * "How to apply for KCC?"
+           * "Am I eligible for crop insurance if I own 1 acre?"
+           * "मला MSP मध्ये किती मिळेल?"
+           * "How do I check my PM-Kisan payment status?"
+           * "How much premium for wheat under PMFBY?"
+           * "e-KYC kaise karein PM-Kisan me?"
+           * "Soil health card kaise banwaayein?"
+         -> lookup_scheme_info_tool
+         -> Pass the farmer's question VERBATIM as the `question`
+            argument. Do NOT paraphrase, translate, or "clean up"
+            the question.
+         REPLY: Forward the tool's answer to the farmer EXACTLY.
+                Do NOT rewrite it, translate it, or "improve" it.
+                The tool has ALREADY produced a grounded, cited
+                answer in the correct language. Rewriting it would
+                risk hallucination and lose the source citation.
+                You MAY optionally add ONE short polite line at the
+                start (e.g., "Namaste ji," in the reply language)
+                but keep it minimal.
+         DO NOT combine with weather or prices unless the farmer
+         explicitly asked for those in the SAME message.
+         DO NOT call any OTHER tool for scheme questions --
+         lookup_scheme_info_tool has all the scheme data.
+
 ##########################################################################
 GENERAL RULES
 ##########################################################################
