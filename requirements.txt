@@ -28,3 +28,8 @@ statsmodels>=0.14.0
 # I/O helpers
 openpyxl>=3.1.0
 python-dotenv>=1.0.0
+
+# Append the new line to requirements.txt
+echo "" >> requirements.txt
+echo "# MCP server (Stage MCP.2+)" >> requirements.txt
+echo "mcp[cli]>=1.0.0" >> requirements.txt

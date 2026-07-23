@@ -119,7 +119,7 @@ def build_index(reset: bool = False,
     """Build the persistent Chroma index from schemes/*.md.
 
     Args:
-        reset:     Wipe scheme_index/ before rebuilding.
+        reset:     Wipe scheme_index/ before rebuilding. First, erase the entire whiteboard (delete scheme_index/), Then write fresh, Everything on the whiteboard is guaranteed to match today's schemes/*.md files
         only_file: Index just one file (e.g. 'pm_kisan.md').
         dry_run:   Show chunks without calling OpenAI (no cost).
     """
@@ -139,7 +139,7 @@ def build_index(reset: bool = False,
         if not files[0].exists():
             sys.exit(f"[error] file not found: {files[0]}")
     else:
-        files = sorted(schemes_dir.glob("*.md"))
+        files = sorted(schemes_dir.glob("*.md")) # find ALL .md files in the folder
         # Ignore the folder's own README.md if present.
         files = [f for f in files if f.name.lower() != "readme.md"]
 
