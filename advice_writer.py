@@ -57,6 +57,23 @@ from db import init_db
 
 MODEL_NAME = os.environ.get("AGRI_WRITER_MODEL", "gpt-4o-mini")
 
+MODE_INSTRUCTIONS = {
+    "morning": (
+        "This is the MORNING briefing (11 AM). Frame as OPENING prices for TODAY. "
+        "Tell the farmer what to do TODAY - present-tense, action-oriented verbs "
+        "(bech dijiye / vika / sell now, wait). Do NOT mention tomorrow's plan. "
+        "Focus on today's price window and today's action only."
+    ),
+    "evening": (
+        "This is the EVENING briefing (9 PM). Frame as END-OF-DAY summary + "
+        "planning for TOMORROW. State today's best price observed, then give "
+        "tomorrow's outlook. If selling tomorrow is advised, EXPLICITLY prompt "
+        "the farmer to arrange transport TONIGHT (book truck/tempo). "
+        "Use future/plan-oriented verbs (kal ke liye / udya / tomorrow you can, plan for)."
+    ),
+}
+
+
 LANG_NAMES = {
     "en": "English",
     "hi": "Hindi",
@@ -66,6 +83,9 @@ LANG_NAMES = {
 
 SYSTEM_PROMPT = """You are the message writer for Agri-Agent, an SMS/chat \
 advisor for small farmers in Pune district, India.
+
+BRIEFING CONTEXT:
+{mode_instructions}
 
 You receive a farmer's profile and a JSON list of NUDGES (one per issue). \
 Your job: produce ONE short, natural message that combines all nudges \
@@ -132,7 +152,10 @@ def _write_one(llm: ChatOpenAI, farmer: dict,
         "nudges": nudges_sorted,
     }
 
-    sys_msg = SystemMessage(content=SYSTEM_PROMPT.format(lang_name=lang_name))
+    mode_key = os.environ.get("BRIEFING_MODE", "morning")
+    mode_text = MODE_INSTRUCTIONS.get(mode_key, MODE_INSTRUCTIONS["morning"])
+    sys_msg = SystemMessage(content=SYSTEM_PROMPT.format(
+        lang_name=lang_name, mode_instructions=mode_text))
     hum_msg = HumanMessage(content=(
         f"Write the message now. Input:\n\n"
         f"{json.dumps(payload, indent=2, ensure_ascii=False)}"
@@ -149,8 +172,9 @@ def write_daily_messages(advice_path: Optional[str] = None,
     Returns the list of messages as dicts.
     """
     today = today or date.today()
-    advice_path = advice_path or f"daily_advice_{today.isoformat()}.json"
-    out_path    = out_path    or f"daily_messages_{today.isoformat()}.json"
+    mode = os.environ.get("BRIEFING_MODE", "morning")
+    advice_path = advice_path or f"daily_advice_{today.isoformat()}_{mode}.json"
+    out_path    = out_path    or f"daily_messages_{today.isoformat()}_{mode}.json"
 
     advice = _load_advice(advice_path)
     nudges = advice.get("nudges", [])

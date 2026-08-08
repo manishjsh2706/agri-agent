@@ -79,7 +79,8 @@ def _send(chat_id: int, text: str) -> tuple[bool, str]:
 def send_all(today: Optional[date] = None,
              messages_path: Optional[str] = None) -> dict:
     today = today or date.today()
-    messages_path = messages_path or f"daily_messages_{today.isoformat()}.json"
+    mode = os.environ.get("BRIEFING_MODE", "morning")
+    messages_path = messages_path or f"daily_messages_{today.isoformat()}_{mode}.json"
 
     messages = _load_messages(messages_path)
     if not messages:

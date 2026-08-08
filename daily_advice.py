@@ -38,6 +38,7 @@ Run
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timedelta
 from typing import Optional
@@ -283,9 +284,10 @@ def decide_daily_advice(today: Optional[date] = None,
     result = [asdict(n) for n in all_nudges]
 
     if write_json:
-        path = f"daily_advice_{today.isoformat()}.json"
+        mode = os.environ.get("BRIEFING_MODE", "morning")
+        path = f"daily_advice_{today.isoformat()}_{mode}.json"
         with open(path, "w") as fh:
-            json.dump({"date": today.isoformat(), "nudges": result}, fh, indent=2)
+            json.dump({"date": today.isoformat(), "mode": mode, "nudges": result}, fh, indent=2)
 
     if verbose:
         _print_report(today, result, farmers)
