@@ -115,6 +115,11 @@ def _crops_of_interest(stock: list[dict], intents: list[dict]) -> set[str]:
 # Trigger 1: SELL_SIGNAL -- best_window says 'sell today'
 # ---------------------------------------------------------------------------
 def _check_sell_signal(farmer: dict, crop: str, conn) -> Optional[Nudge]:
+    """Handles three forecast outcomes:
+       sell_today   -> SELL_SIGNAL (today is peak)
+       wait         -> WAIT_SIGNAL (better price coming)
+       indifferent  -> SELL_SIGNAL (no upside to waiting)
+    """
     history = get_crop_history(conn, "Maharashtra", "Pune", crop)
     if not history or len(history) < MIN_HISTORY_DAYS:
         return None
@@ -123,36 +128,60 @@ def _check_sell_signal(farmer: dict, crop: str, conn) -> Optional[Nudge]:
     except Exception:
         return None
 
-    if bw.get("action") != "sell_today":
-        return None
-
-    todays = bw.get("todays_price")
+    action   = bw.get("action")
+    todays   = bw.get("todays_price")
     expected = bw.get("expected_price")
-    conf = bw.get("confidence", "medium")
+    best_day = bw.get("best_day_date")
+    gain_pct = bw.get("gain_vs_today_pct", 0) or 0
+    conf     = bw.get("confidence", "medium")
+    urg_from_conf = {"high": "high", "medium": "medium", "low": "low"}.get(conf, "medium")
 
-    reason = (
-        f"Forecast says SELL TODAY: today's price ~Rs{todays:.0f}/q is at "
-        f"the top of the 7-day window (best expected ~Rs{expected:.0f} on "
-        f"{bw.get('best_day_date')})."
-    )
-    urgency = {"high": "high", "medium": "medium", "low": "low"}.get(conf, "medium")
+    if action == "sell_today":
+        trigger = "SELL_SIGNAL"
+        urgency = urg_from_conf
+        reason = (
+            f"Forecast says SELL TODAY: today's price ~Rs{todays:.0f}/q is at "
+            f"the top of the 7-day window (best expected ~Rs{expected:.0f} on "
+            f"{best_day})."
+        )
+    elif action == "wait":
+        trigger = "WAIT_SIGNAL"
+        # Wait signals are informational -- cap urgency at medium.
+        urgency = "medium" if urg_from_conf == "high" else "low"
+        reason = (
+            f"Forecast says WAIT: today's price is ~Rs{todays:.0f}/q, but a "
+            f"better price of ~Rs{expected:.0f}/q is expected on {best_day} "
+            f"({gain_pct:+.1f}%). Consider holding your stock."
+        )
+    elif action == "indifferent":
+        # No upside expected -- prices will stay similar. Sell now if ready.
+        trigger = "SELL_SIGNAL"
+        urgency = "low"
+        reason = (
+            f"Forecast shows NO UPSIDE: today's price is ~Rs{todays:.0f}/q and "
+            f"the next 7 days are expected to stay similar (~Rs{expected:.0f}/q). "
+            f"No reason to wait -- sell today if you are ready."
+        )
+    else:
+        return None
 
     return Nudge(
         farmer_phone   = farmer["phone"],
         farmer_name    = farmer["name"],
         farmer_village = farmer.get("village") or "",
-        trigger        = "SELL_SIGNAL",
+        trigger        = trigger,
         crop           = crop,
         urgency        = urgency,
         reason         = reason,
         data           = {
-            "todays_price":     todays,
-            "expected_price":   expected,
-            "best_day_date":    bw.get("best_day_date"),
-            "gain_vs_today":    bw.get("gain_vs_today"),
-            "gain_vs_today_pct":bw.get("gain_vs_today_pct"),
-            "confidence":       conf,
-            "forecast":         bw.get("forecast"),
+            "action":            action,
+            "todays_price":      todays,
+            "expected_price":    expected,
+            "best_day_date":     best_day,
+            "gain_vs_today":     bw.get("gain_vs_today"),
+            "gain_vs_today_pct": gain_pct,
+            "confidence":        conf,
+            "forecast":          bw.get("forecast"),
         },
     )
 
